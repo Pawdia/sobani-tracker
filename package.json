@@ -1,0 +1,24 @@
+{
+  "name": "sobani-tracker",
+  "version": "1.0.0",
+  "description": "Tracker Server for Sobani",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nekomeowww/sobani-tracker.git"
+  },
+  "author": "Ayaka Neko",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nekomeowww/sobani-tracker/issues"
+  },
+  "homepage": "https://github.com/nekomeowww/sobani-tracker#readme",
+  "dependencies": {
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
+    "nedb": "^1.8.0"
+  }
+}
