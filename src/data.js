@@ -3,7 +3,7 @@ const path = require("path")
 const DataStore = require("nedb")
 
 let __dbName = path.resolve("./data/sobani_tracker.db")
-let __dataDir = path.parse(__dbName)
+let __dataDir = path.parse(__dbName).dir
 
 if (!fs.existsSync(__dataDir)) {
     fs.mkdirSync(__dataDir)

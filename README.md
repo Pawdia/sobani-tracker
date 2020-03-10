@@ -22,7 +22,7 @@ yarn install
 Start server
 
 ```
-yarn run
+yarn run test
 ```
 
 ## API Documentation
