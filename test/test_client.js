@@ -30,7 +30,7 @@ Promise.all([
     axios.post("http://127.0.0.1:" + config.port + "/push", 
     {
         shareId: test1ShareId,
-        multiaddr: test2Multiaddr
+        multiaddr: "ip4/123.112.121.222/tcp/4001/p2p/" + test2Multiaddr
     }
     ).then(res => {
         console.log(res)
