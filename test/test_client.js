@@ -1,11 +1,42 @@
+const hash = require("../src/util/hash")
 const axios = require("axios")
+const config = require("../config.json")
 
-axios.post("https://cf28155b.ngrok.io", 
+// Announce
+let test1Multiaddr = hash.sha256("test1")
+let test2Multiaddr = hash.sha256("test2")
+
+Promise.all([
+    axios.post("http://127.0.0.1:" + config.port + "/announce", 
     { 
-        multiaddr: "asuahdiauhdqiuwnduqwdiqu", 
-        ip: "123.112.121.111", 
+        multiaddr: "ip4/123.112.121.221/tcp/4000/p2p/" + test1Multiaddr, 
+        ip: "123.112.121.221", 
         port: "4000"
+    }
+    ),
+    axios.post("http://127.0.0.1:" + config.port + "/announce",
+    {
+        multiaddr: "ip4/123.112.121.222/tcp/4001/p2p/" + test2Multiaddr,
+        ip: "123.112.121.222",
+        port: "4001"
+    }
+)
+]).then(total => {
+    // returns two shareId
+    let test1ShareId = total[0].data.shareId
+    let test2ShareId = total[1].data.shareId
+
+    // Push
+    axios.post("http://127.0.0.1:" + config.port + "/push", 
+    {
+        shareId: test1ShareId,
+        multiaddr: test2Multiaddr
+    }
+    ).then(res => {
+        console.log(res)
+    }).catch(err => {
+        console.log(err)
     })
-    .then(res => {
-    console.log(res)
+}).catch(err => {
+    console.log(err)
 })
