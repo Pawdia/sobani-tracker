@@ -1,42 +1,58 @@
 const hash = require("../src/util/hash")
-const axios = require("axios")
 const config = require("../config.json")
+const udp = require('dgram')
+
+// creating two client sockets
+var client1 = udp.createSocket('udp4');
+var client2 = udp.createSocket('udp4');
+
+// Announce Data
+var announceData = JSON.stringify({ action: "announce" });
+
+client1.on('message', (msg, remote) => {
+    try {
+        response = JSON.parse(msg)
+        
+        if (response.action === "announceReceived") {
+            // Push Data
+            var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId });
+            
+            // Client 2 send push request after client 1 has successfully registered on tracker
+            client2.send(pushData, config.port, 'localhost', err => {
+                if (err) {
+                    console.log(err)
+                }
+            })
+        }
+    } catch (err) {
+        console.log(err)
+    }
+})
+
+client2.on('message', (msg, remote) => {
+    try {
+        response = JSON.parse(msg)
+        
+        if (response.action === "announceReceived") {
+            // Push Data
+            var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId });
+            console.log(pushData)
+        } else if (response.action === "pushReceived") {
+            console.log(response.data)
+        }
+    } catch (err) {
+        console.log(err)
+    }
+})
 
 // Announce
-let test1Multiaddr = "ip4/123.112.121.221/tcp/4000/p2p/" + hash.sha256("test1")
-let test2Multiaddr = "ip4/123.112.121.222/tcp/4001/p2p/" + hash.sha256("test2")
-
-Promise.all([
-    axios.post("http://127.0.0.1:" + config.port + "/announce", 
-    { 
-        multiaddr: test1Multiaddr, 
-        ip: "123.112.121.221", 
-        port: "4000"
-    }
-    ),
-    axios.post("http://127.0.0.1:" + config.port + "/announce",
-    {
-        multiaddr: test2Multiaddr,
-        ip: "123.112.121.222",
-        port: "4001"
-    }
-)
-]).then(total => {
-    // returns two shareId
-    let test1ShareId = total[0].data.shareId
-    let test2ShareId = total[1].data.shareId
-
-    // Push
-    axios.post("http://127.0.0.1:" + config.port + "/push", 
-    {
-        shareId: test1ShareId,
-        multiaddr: test2Multiaddr
-    }
-    ).then(res => {
-        console.log(res)
-    }).catch(err => {
+client1.send(announceData, config.port, 'localhost', err => {
+    if (err) {
         console.log(err)
-    })
-}).catch(err => {
-    console.log(err)
+    }
+})
+client2.send(announceData, config.port, 'localhost', err => {
+    if (err) {
+        console.log(err)
+    }
 })

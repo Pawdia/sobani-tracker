@@ -1,10 +1,7 @@
-const Koa = require("koa")
-const bodyParser = require("koa-bodyparser")
+const config = require("../config.json")
+let router = require("../src/router")
+const SobaniServer = require("../src/sobani-server")
+const app = new SobaniServer()
 
-const app = new Koa()
-app.proxy = true
-app.use(bodyParser())
-app.use(async (ctx, next) => {
-    console.log(ctx.request.body)
-})
-app.listen(5000)
+app.use(router)
+app.listen(config.port)
