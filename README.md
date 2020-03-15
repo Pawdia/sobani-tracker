@@ -44,7 +44,7 @@ Expected response from server:
 ```json
 {
   "action": "announceReceived",
-	"data": {
+  "data": {
     "shareId": "1AbhoECj"
   }
 }
@@ -69,10 +69,10 @@ Expected response from server:
 
 ```json
 {
-	"action": "pulseReceived",
+  "action": "pulseReceived",
   "data": {
     "status": "0",
-		"overriden": "false"
+    "overriden": "false"
   }
 }
 ```
@@ -92,7 +92,7 @@ Expected response from server:
 
 ```json
 {
-	"action": "pushReceived",
+  "action": "pushReceived",
   "data": {
     "peeraddr": "1.2.3.4:23333"
   }
@@ -140,4 +140,3 @@ Expected response from server:
 | Field    | Type   | Required | Description |
 | -------- | ------ | -------- | ----------- |
 | peeraddr | string | yes      | `IP:Port`   |
-
