@@ -70,7 +70,7 @@ base.on("push", async (ctx, next) => {
         let pushRes = {
             action: "pushReceived",
             data: {
-                message: `${target.ip}:${target.port}`
+                peeraddr: `${target.ip}:${target.port}`
             }
         }
 
