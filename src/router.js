@@ -22,18 +22,12 @@ base.on("announce", async (ctx, next) => {
         if (!res) {
             console.log(`New peer connected! Generating ShareID...`)
             ctx.sessionId = Data.dbInsert({ ip: ip, port: port, shareId: ctx.shareId }).then(res => {
-                Data.dbFind({ ip: ip, port: port }).then(res => {
-                    console.log("new", res)
-                })
                 console.log(`ShareID ${ctx.shareId} successfully generated for peer ${ip}:${port}!`)
             })
         }
         else {
             console.log(`Peer connection updated! Generating ShareID...`)
             Data.dbUpdate({ ip: ip, port: port }, { $set: { shareId: ctx.shareId } }).then(res => {
-                Data.dbFind({ ip: ip, port: port }).then(res => {
-                    console.log("updated", res)
-                })
                 console.log(`ShareID ${ctx.shareId} successfully generated for peer ${ip}:${port}!`)
             })
         }
