@@ -1,5 +1,5 @@
 // Dependencies
-const Router = require("./sobani-router")
+const Router = require("./core/router")
 
 // Local Packages
 const hash = require("./util/hash")
