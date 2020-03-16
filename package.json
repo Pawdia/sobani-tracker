@@ -17,12 +17,6 @@
   },
   "homepage": "https://github.com/nekomeowww/sobani-tracker#readme",
   "dependencies": {
-    "axios": "^0.19.2",
-    "koa": "^2.11.0",
-    "koa-body": "^4.1.1",
-    "koa-bodyparser": "^4.2.1",
-    "koa-compress": "^3.0.0",
-    "koa-router": "^8.0.8",
     "nedb": "^1.8.0"
   }
 }
