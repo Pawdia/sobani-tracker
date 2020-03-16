@@ -6,15 +6,16 @@ function SobaniServer() {
     this.use = (func) => { this.pipeline.push(func) }
     
     this._foldPipeline = async (message, remote) => {
-        let ctx = { message: message, remote: remote };
+        let ctx = { message: message, remote: remote }
         try { ctx.requestBody = JSON.parse(ctx.message) } catch {}
         
         finalHandler = async () => {
-            console.log(ctx.body)
             if (ctx.body) {
                 if (typeof ctx.body !== 'string') ctx.body = JSON.stringify(ctx.body)
                 this.socket.send(ctx.body, remote.port, remote.address, (err) => {
-                    if (err) console.log(`[ERROR] UDP message sent to ${remote.address}:${remote.port}: ${err}`);;
+                    if (err) {
+                        console.log(`[ERROR] UDP message sent to ${remote.address}:${remote.port}: ${err}`)
+                    }
                 })
             }
         }
@@ -28,14 +29,17 @@ function SobaniServer() {
             } else {
                 await handler(ctx, pipelineBreaker)
             }
-            if (breakPipeline) { await finalHandler(); break }
+            if (breakPipeline) { 
+                await finalHandler()
+                break
+            }
         }
     }
     
     this.listen = (port) => {
         this.socket = udp.createSocket('udp4')
         this.socket.on('message', this._foldPipeline)
-        this.socket.bind(port);
+        this.socket.bind(port)
     }
 }
 

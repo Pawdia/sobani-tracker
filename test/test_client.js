@@ -3,11 +3,11 @@ const config = require("../config.json")
 const udp = require('dgram')
 
 // creating two client sockets
-var client1 = udp.createSocket('udp4');
-var client2 = udp.createSocket('udp4');
+var client1 = udp.createSocket('udp4')
+var client2 = udp.createSocket('udp4')
 
 // Announce Data
-var announceData = JSON.stringify({ action: "announce" });
+var announceData = JSON.stringify({ action: "announce" })
 
 client1.on('message', (msg, remote) => {
     try {
@@ -15,7 +15,7 @@ client1.on('message', (msg, remote) => {
         
         if (response.action === "announceReceived") {
             // Push Data
-            var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId });
+            var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId })
             
             // Client 2 send push request after client 1 has successfully registered on tracker
             client2.send(pushData, config.port, 'localhost', err => {
@@ -35,7 +35,7 @@ client2.on('message', (msg, remote) => {
         
         if (response.action === "announceReceived") {
             // Push Data
-            var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId });
+            var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId })
             console.log(pushData)
         } else if (response.action === "pushReceived") {
             console.log(response.data)
