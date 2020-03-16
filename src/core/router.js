@@ -34,7 +34,7 @@ class SobaniRouter {
      */
     async emit(event, ctx, next) {
         // get `handler` from `routerMap`
-        handler = this.routerMap[event]
+        let handler = this.routerMap[event]
         // if such `handler` exists
         // then invoke `handler` with `ctx` and `next`
         if (handler !== undefined) await handler(ctx, next)
