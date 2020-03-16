@@ -1,5 +1,5 @@
 /**
- * Create a sobani router that process specify event on receiving UDP message
+ * Create a sobani router that processes specific event on receiving UDP message
  *
  * @method on(event, handler)     - Saves handler which will be invoked on given `event`
  * @method emit(event, ctx, next) - Emits event to corresponding handler
