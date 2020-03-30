@@ -13,7 +13,7 @@ client1.on('message', (msg, remote) => {
     try {
         response = JSON.parse(msg)
         
-        if (response.action === "announceReceived") {
+        if (response.action === "announced") {
             // Push Data
             var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId })
             
@@ -33,11 +33,11 @@ client2.on('message', (msg, remote) => {
     try {
         response = JSON.parse(msg)
         
-        if (response.action === "announceReceived") {
+        if (response.action === "announced") {
             // Push Data
             var pushData = JSON.stringify({ action: "push", shareId: response.data.shareId })
             console.log(pushData)
-        } else if (response.action === "pushReceived") {
+        } else if (response.action === "pushed") {
             console.log(response.data)
         }
     } catch (err) {

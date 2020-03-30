@@ -12,12 +12,6 @@ app.use(async (ctx, next) => {
     await next()
 })
 
-// Log out requestBody
-app.use(async (ctx, next) => {
-    console.log(ctx.requestBody)
-    await next()
-})
-
 // Regist router
 app.use(router)
 
