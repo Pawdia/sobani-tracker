@@ -24,9 +24,14 @@ class SobaniServer {
      */
     async _foldPipeline(message, remote) {
         // construct context
-        let ctx = { message: message, remote: remote }
+        let ctx = { 
+            server: this.socket, 
+            message: message, 
+            remote: remote,
+            timestamp: Math.floor(new Date() / 1000),
+        }
         // try to parse message as JSON object
-        try { ctx.requestBody = JSON.parse(ctx.message) } catch {}
+        try { ctx.requestBody = JSON.parse(ctx.message) } catch (err) {}
         
         // invoke handlers in pipeline by the sequenece that they were added
         for (var index = 0; index < this.pipeline.length; index++) {
