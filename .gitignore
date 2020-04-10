@@ -103,5 +103,8 @@ dist
 # TernJS port file
 .tern-port
 
-# User Defined
-data/
+# macOS
+.DS_Store
+
+# Build / Release
+release-builds/

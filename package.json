@@ -4,7 +4,7 @@
   "description": "Tracker Server for Sobani",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js"
+    "test": "node test/test.js"
   },
   "repository": {
     "type": "git",
