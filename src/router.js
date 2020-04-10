@@ -21,7 +21,7 @@ base.on("announce", async (ctx, next) => {
     Data.dbFind({ ip: ip, port: port }).then(res => {
         // pull if has
         if (!res) {
-            console.log(`New peer connected! Generating ShareID...`)
+            console.log(`[announce] New peer connected! Generating ShareID...`)
             ctx.sessionId = Data.dbInsert({ 
                 ip: ip, 
                 port: port, 
@@ -29,13 +29,13 @@ base.on("announce", async (ctx, next) => {
                 id: body.id,
                 lastSeen: ctx.timestamp
              }).then(res => {
-                console.log(`ShareID ${ctx.shareId} successfully generated for peer ${ip}:${port}!`)
+                console.log(`[announce] ShareID ${ctx.shareId} successfully generated for peer ${ip}:${port}!`)
             })
         }
         else {
-            console.log(`Peer connection updated! Generating ShareID...`)
+            console.log(`[announce] Peer connection updated! Generating ShareID...`)
             Data.dbUpdate({ ip: ip, port: port }, { $set: { shareId: ctx.shareId, id: body.id, lastSeen: ctx.timestamp } }).then(res => {
-                console.log(`ShareID ${ctx.shareId} successfully generated for peer ${ip}:${port}!`)
+                console.log(`[announce] ShareID ${ctx.shareId} successfully generated for peer ${ip}:${port}!`)
             })
         }
     })
@@ -80,41 +80,58 @@ base.on("alive", async (ctx, next) => {
 
 // push
 base.on("push", async (ctx, next) => {
-    let body = ctx.requestBody
-    let targetShareId = body.shareId
+    console.log(`[push] from ${ctx.remote.address}:${ctx.remote.port}`)
+    Data.dbFind({ ip: ctx.remote.address, port: ctx.remote.port }).then(async requestor => {
+        // requestor expired / not announced yet
+        if (!requestor) {
+            console.log(`Peer [${ctx.remote.address}:${ctx.remote.port}] connection expired, please reconnect`)
+            let expiredMessage = {
+                action: 'expired'
+            }
+            ctx.body = expiredMessage
+        }
+        // requestor exists
+        else {
+            requestor = requestor.pop()
+            let body = ctx.requestBody
+            let requesteeId = body.shareId
+            
+            let findResult = await Data.dbFind({ shareId: requesteeId })
+            if (findResult) {
+                let requestee = findResult.pop()
+                console.log(`[push] Establishing connection from ${requestor.ip}:${requestor.port} to ${requestee.ip}:${requestee.port}...`)
 
-    console.log("on push, targetShareId", targetShareId)
-    // return shareId and set multiaddr into session
-    let findResult = await Data.dbFind({ shareId: targetShareId })
-    if (findResult) {
-        let target = findResult.pop()
-        console.log(`Establishing connection from ${ctx.remote.address}:${ctx.remote.port} to ${target.ip}:${target.port}...`)
+                // Feedback to requestor
+                // send back pushedMessage to peer
+                // Pushed -> Server send to requestor with pushedMessage with requestee's info
+                let pushedMessage = {
+                    action: "pushed",
+                    data: {
+                        peeraddr: `${requestee.ip}:${requestee.port}`,
+                        peerShareId: requestee.shareId
+                    }
+                }
+                ctx.server.send(JSON.stringify(pushedMessage), ctx.remote.port, ctx.remote.address, (err) => {
+                    if (err) console.log(err)
+                })
+                console.log(`[pushed] to ${ctx.remote.address}:${ctx.remote.port}`)
 
-        // Feedback to client whom from this socket
-        // send back pushedMessage to peer
-        // Pushed -> Server send to A with pushedMessage with B info
-        let pushedMessage = {
-            action: "pushed",
-            data: {
-                peeraddr: `${target.ip}:${target.port}`
+                // Income -> Sever send to B with incomeMessage with A info
+                let incomeMessage = {
+                    action: 'income', 
+                    data: {
+                        peeraddr: `${requestor.ip}:${requestor.port}`,
+                        peerShareId: requestor.shareId
+                    }
+                }
+                ctx.server.send(JSON.stringify(incomeMessage), requestee.port, requestee.ip, (err) => {
+                    if (err) console.log(err)
+                })
+                console.log(`[income] to ${requestee.ip}:${requestee.port}`)
+                await next()
             }
         }
-        ctx.server.send(JSON.stringify(pushedMessage), ctx.remote.port, ctx.remote.address, (err) => {
-            if (err) console.log(err)
-        })
-
-        // Income -> Sever send to B with incomeMessage with A info
-        let incomeMessage = {
-            action: 'income', 
-            data: {
-                peeraddr: `${ctx.remote.address}:${ctx.remote.port}`
-            }
-        }
-        ctx.server.send(JSON.stringify(incomeMessage), target.port, target.ip, (err) => {
-            if (err) console.log(err)
-        })
-        await next()
-    }
+    })
 })
 
 module.exports = base
