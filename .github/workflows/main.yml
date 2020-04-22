@@ -1,0 +1,39 @@
+name: Sobani-tracker-test
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  release:
+    types:
+      - created
+
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    strategy:
+      matrix:
+        os:
+          - ubuntu-18.04
+          - macos-latest
+          - windows-latest
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Setup Node.js
+    - name: Setup Node.js for use with actions
+      uses: actions/setup-node@v1.1.0
+
+    # Install dependencies
+    - name: Install dependencies
+      run: npm install
+
+    # Test
+    - name: Test
+      run: node test/test.js
+
