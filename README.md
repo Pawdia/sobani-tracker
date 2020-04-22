@@ -25,6 +25,25 @@ chmod +x ./deploy-docker.sh
 ./deploy-docker.sh
 ```
 
+## Setup with Docker Composer
+
+Clone to your instance
+
+```
+git clone https://github.com/nekomeowww/sobani-tracker.git
+```
+
+```
+cd sobani-tracker
+
+# default port is 3000
+# if you want another port
+# please edit in docker-compose.yml
+
+chmod +x ./deploy-docker-compose.sh
+./deploy-docker-compose.sh
+```
+
 ## Setup
 
 Clone to your instance

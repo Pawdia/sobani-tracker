@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  sobani-tracker:
+    image: sobani-tracker
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sobani-tracker
+    ports:
+      - '3000:3000/udp'
