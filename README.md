@@ -23,6 +23,10 @@ cd sobani-tracker
 
 chmod +x ./deploy-docker.sh
 ./deploy-docker.sh
+
+# test
+# default tracker set to 'localhost:3000'
+node test/test-client-only.js
 ```
 
 ## Setup with Docker Composer
@@ -42,6 +46,10 @@ cd sobani-tracker
 
 chmod +x ./deploy-docker-compose.sh
 ./deploy-docker-compose.sh
+
+# test
+# default tracker set to 'localhost:3000'
+node test/test-client-only.js
 ```
 
 ## Setup
