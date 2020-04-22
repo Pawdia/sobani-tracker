@@ -1,6 +1,6 @@
 // Local Packages
 let router = require("./src/router")
-const config = require("./config.json")
+const config = require("./config/config.json")
 
 // Init
 const SobaniServer = require("./src/core/server")
