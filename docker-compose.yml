@@ -8,5 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: sobani-tracker
+    volumes:
+      - ./config:/usr/src/sobani-tracker/config
     ports:
       - '3000:3000/udp'
