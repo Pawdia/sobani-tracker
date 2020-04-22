@@ -4,6 +4,27 @@
 
 Aim to set up a tracker server for sobani service and clients
 
+## Setup with Docker
+
+Clone to your instance
+
+```
+git clone https://github.com/nekomeowww/sobani-tracker.git
+```
+
+```
+cd sobani-tracker
+
+# default port is 3000
+# if you want another port
+# please edit in deploy-docker.sh
+# if you are using this with docker composer
+# please change config.json and Dockerfile
+
+chmod +x ./deploy-docker.sh
+./deploy-docker.sh
+```
+
 ## Setup
 
 Clone to your instance
