@@ -9,6 +9,6 @@ WORKDIR /usr/src/sobani-tracker
 COPY . .
 
 RUN npm install
-EXPOSE 3000
+EXPOSE 3000/udp
 
 CMD [ "node", "app.js" ]
