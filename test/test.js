@@ -1,4 +1,4 @@
-const config = require("../config.json")
+const config = require("../config/config.json")
 let router = require("../src/router")
 const SobaniServer = require("../src/core/server")
 const app = new SobaniServer()
