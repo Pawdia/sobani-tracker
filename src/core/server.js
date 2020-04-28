@@ -24,28 +24,28 @@ class SobaniServer {
      */
     async _foldPipeline(message, remote) {
         // construct context
-        let ctx = { 
-            server: this.socket, 
-            message: message, 
+        let ctx = {
+            server: this.socket,
+            message: message,
             remote: remote,
             timestamp: Math.floor(new Date() / 1000),
         }
         // try to parse message as JSON object
-        try { ctx.requestBody = JSON.parse(ctx.message) } catch (err) {}
-        
+        try { ctx.requestBody = JSON.parse(ctx.message) } catch (err) { }
+
         // invoke handlers in pipeline by the sequenece that they were added
         for (var index = 0; index < this.pipeline.length; index++) {
             // get current handler
             let handler = this.pipeline[index]
             // break pipeline if user does not call `next()`
             var breakPipeline = true
-            let pipelineBreaker = async () => { 
+            let pipelineBreaker = async () => {
                 // - if user does not call `next()`
                 //   `breakPipeline` will remain `true`
                 // - if `handler` is the last one in pipeline
                 //   then even if user calls `next()`
                 //   `breakPipeline` will still remain `true`
-                if (index + 1 != this.pipeline.length) breakPipeline = false 
+                if (index + 1 != this.pipeline.length) breakPipeline = false
             }
             // if `handler.emit` is a function, which suggests it is probably `SobaniRouter` or `SobaniRouter` alike object
             // and the message in UDP packet can be successfully parsed
@@ -58,7 +58,7 @@ class SobaniServer {
                 await handler(ctx, pipelineBreaker)
             }
             // if `breakPipeline` is still `true`
-            if (breakPipeline) { 
+            if (breakPipeline) {
                 // then finalize this session 
                 await this._finalHandler(ctx, remote)
                 break
@@ -79,7 +79,9 @@ class SobaniServer {
         // then `ctx.body` will be used as response to remote client
         if (ctx.body) {
             // if `ctx.body` is not `string` type, then encode it with `JSON.stringify`
-            if (typeof ctx.body !== 'string') ctx.body = JSON.stringify(ctx.body)
+            if (typeof ctx.body !== 'string') {
+                ctx.body = JSON.stringify(ctx.body)
+            }
             // send `ctx.body` to remote client
             this.socket.send(ctx.body, remote.port, remote.address, (err) => {
                 if (err) {
