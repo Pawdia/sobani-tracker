@@ -64,7 +64,7 @@ base.on("alive", async (ctx, next) => {
             let expiredMessage = {
                 action: 'expired'
             }
-            ctx.body = alivedMessage
+            ctx.body = expiredMessage
         }
         // keep alive
         else {
