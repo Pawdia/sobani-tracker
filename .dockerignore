@@ -1,7 +1,0 @@
-.git
-*.md
-deploy.sh
-deploy-docker.sh
-deploy-docker-compose.sh
-config
-test
