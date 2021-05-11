@@ -16,7 +16,7 @@ import (
 func main() {
 	// 加载配置文件
 	conf := config.LoadConfig()
-	logger.Info("配置文件加载完成...")
+	logger.Info("配置文件加载完成")
 	service.Init(conf)
 
 	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(conf.IP, strconv.Itoa(conf.Port)))
@@ -29,9 +29,8 @@ func main() {
 		fmt.Println("Error listening:", err)
 		os.Exit(1)
 	}
-	logger.Infof("当前服务器运行在 %s ...", addr.String())
+	logger.Infof("当前服务器运行在 %s", addr.String())
 	defer conn.Close()
-	fmt.Println(conn)
 	for {
 		handleClient(conn)
 	}
