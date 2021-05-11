@@ -23,12 +23,7 @@ type Handler struct {
 type Func func(*server.Context)
 
 // ActionFunc 行为对应的处理控制器调用的函数
-type ActionFunc func(c *Context) (ActionResponse, error)
-
-// Context 上下文
-type Context struct {
-	C *server.Context
-}
+type ActionFunc func(c *server.Context) (ActionResponse, error)
 
 // ActionResponse 行为的响应结构体
 type ActionResponse interface{}
@@ -41,14 +36,14 @@ type baseResponse struct {
 // ErrResponse 错误响应结构体
 type ErrResponse struct {
 	Code    int    `json:"code"`
-	Message string `json:""`
+	Message string `json:"message"`
 }
 
 // NewAction 创建新的行为
 func NewAction(actionType string, handler ActionFunc) {
 	a := &Action{Type: actionType, Func: handler}
 	a.Handler = func(c *server.Context) {
-		ctx := Context{C: c}
+		ctx := *c
 		r, err := a.Func(&ctx)
 		if err != nil {
 			server.Next(c)

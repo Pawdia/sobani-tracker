@@ -1,33 +1,42 @@
 package config
 
 import (
-	"encoding/json"
-	"os"
+	"io/ioutil"
+	"path/filepath"
+
+	"github.com/Pawdia/sobani-tracker/logger"
+	"gopkg.in/yaml.v2"
 )
 
 // ServerConfig 服务器的基本配置结构
 type ServerConfig struct {
-	DataRoot string `json:"data-root"`
-	IP       string `json:"ip"`
-	Port     int    `json:"port"`
+	AppName  string `yaml:"app-name"`
+	DataRoot string `yaml:"data-root"`
+	IP       string `yaml:"ip"`
+	Port     int    `yaml:"port"`
+	NutsDB   NutsDB `yaml:"nutsdb"`
 }
 
 // Conf 用于外部访问 ServerConfig
 var Conf *ServerConfig
 
+// NutsDB 配置
+type NutsDB struct {
+	Dir string `yaml:"path"`
+}
+
 // LoadConfig 载入配置文件
-func LoadConfig() error {
-	file, err := os.Open("./.conf.json")
+func LoadConfig() ServerConfig {
+	fileName, _ := filepath.Abs("./conf.yaml")
+	yamlFile, err := ioutil.ReadFile(fileName)
 	if err != nil {
-		return err
+		logger.Fatal(err)
 	}
 
-	defer file.Close()
-	decoder := json.NewDecoder(file)
-	err = decoder.Decode(&Conf)
+	conf := new(ServerConfig)
+	err = yaml.Unmarshal(yamlFile, conf)
 	if err != nil {
-		return nil
+		return ServerConfig{}
 	}
-
-	return nil
+	return *conf
 }

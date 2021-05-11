@@ -1,15 +1,16 @@
 package service
 
 import (
+	"github.com/Pawdia/sobani-tracker/config"
 	"github.com/Pawdia/sobani-tracker/service/database"
 )
 
+// service
 var (
-	// Kvdb 静态数据库 NutsDB 实例
-	Kvdb *database.Kvdb
+	NutsDB *database.NutsDB
 )
 
-// Init 初始化服务组件
-func Init() {
-	Kvdb = database.InitDatabase()
+// Init 初始化服务
+func Init(conf config.ServerConfig) {
+	NutsDB = database.InitNutsDB(conf)
 }

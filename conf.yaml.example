@@ -1,0 +1,8 @@
+# 服务器配置
+data-root: "./data/nutsdb"
+ip: "0.0.0.0"
+port: 8123
+
+# 数据库配置
+nutsdb: # nutsdb 配置
+  path: "./data/nutsdb" # 静态数据库存放路径
