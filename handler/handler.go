@@ -41,13 +41,13 @@ type ErrResponse struct {
 
 // NewAction 创建新的行为
 func NewAction(actionType string, handler ActionFunc) {
-	a := &Action{Type: actionType, Func: handler}
-	a.Handler = func(c *server.Context) {
-		ctx := *c
-		r, err := a.Func(&ctx)
-		if err != nil {
-			server.Next(c)
-		}
-		c.JSON(baseResponse{Code: CodeSuccess, Data: r})
-	}
+	// a := &Action{Type: actionType, Func: handler}
+	// a.Handler = func(c *server.Context) {
+	// 	ctx := *c
+	// 	r, err := a.Func(&ctx)
+	// 	if err != nil {
+	// 		server.Handle(c)
+	// 	}
+	// 	c.JSON(baseResponse{Code: CodeSuccess, Data: r})
+	// }
 }

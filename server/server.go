@@ -3,34 +3,41 @@ package server
 import (
 	"fmt"
 	"net"
+	"os"
+	"strconv"
+
+	"github.com/Pawdia/sobani-tracker/config"
+	"github.com/Pawdia/sobani-tracker/logger"
 )
 
 // Init 初始化 Sobani Tracker 服务器
-func Init() {
-	listener, err := net.ListenUDP("udp", &net.UDPAddr{IP: net.ParseIP("127.0.0.1"), Port: 9981})
+func Init(conf config.ServerConfig) {
+	addr, err := net.ResolveUDPAddr("udp", net.JoinHostPort(conf.IP, strconv.Itoa(conf.Port)))
 	if err != nil {
-		fmt.Println(err)
-		return
+		fmt.Println("Can't resolve address: ", err)
+		os.Exit(1)
 	}
-
-	fmt.Printf("Local: <%s> \n", listener.LocalAddr().String())
-
-	data := make([]byte, 1024)
+	conn, err := net.ListenUDP("udp", addr)
+	if err != nil {
+		fmt.Println("Error listening:", err)
+		os.Exit(1)
+	}
+	logger.Infof("当前服务器运行在 %s", addr.String())
+	defer conn.Close()
 	for {
-		n, remoteAddr, err := listener.ReadFromUDP(data)
-		if err != nil {
-			fmt.Printf("error during read %s", err)
-		}
-
-		fmt.Printf("<%s> %s\n", remoteAddr, data[:n])
-		_, err = listener.WriteToUDP([]byte("world"), remoteAddr)
-		if err != nil {
-			fmt.Printf(err.Error())
-		}
+		handleClient(conn)
 	}
 }
 
-// Next 下一个中间键
-func Next(c *Context) {
+func handleClient(conn *net.UDPConn) {
+	data := make([]byte, 1024)
+	n, remoteAddr, err := conn.ReadFromUDP(data)
+	if err != nil {
+		fmt.Println("failed to read UDP msg because of ", err.Error())
+		return
+	}
 
+	fmt.Println(n, remoteAddr)
+	fmt.Println(string(data[:n]))
+	conn.WriteToUDP([]byte("hello, world!"), remoteAddr)
 }
