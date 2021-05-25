@@ -2,6 +2,8 @@ package peer
 
 import (
 	"encoding/json"
+	"fmt"
+	"net"
 
 	"github.com/Pawdia/sobani-tracker/handler"
 	"github.com/Pawdia/sobani-tracker/logger"
@@ -15,8 +17,13 @@ type pushBody struct {
 type pushContext struct {
 	c    *handler.Context
 	body pushBody
-	resp pushResp
 	data []byte
+
+	srcResp pushResp
+	dstResp pushResp
+
+	srcClientInfo *peer.Info
+	dstClientInfo *peer.Info
 }
 
 type pushResp struct {
@@ -34,23 +41,48 @@ func ActionPush(c *handler.Context) {
 	var push pushContext
 	err := push.load(c)
 	if err != nil {
-		logger.Warnf("%s:%d incoming connection parse errored: %s", push.c.Remote.IP, push.c.Remote.Port, err.Error())
+		logger.Warnf("%s:%d incoming connection parse errored: %s", c.Remote.IP, c.Remote.Port, err.Error())
 		return
 	}
 
-	info, err := peer.GetByRemote(push.c.Remote)
+	push.srcClientInfo, err = peer.GetByRemote(c.Remote)
 	if err != nil {
 		logger.Error(err)
-		// PASS
+		return
 	}
-
-	if info == nil {
+	if push.srcClientInfo == nil {
 		push.expire()
-	} else {
-
+		_, err = c.Instance.WriteToUDP(push.data, c.Remote)
+		if err != nil {
+			logger.Error(err)
+			// PASS
+		}
+		return
 	}
 
-	c.Instance.WriteToUDP(push.data, c.Remote)
+	push.dstClientInfo, err = peer.GetByShareID(push.body.ShareID)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	if push.dstClientInfo != nil {
+		push.sendToSourceClient()
+		logger.Infof("[pushed] from %s:%d to %s:%d with shareID: %s", push.srcClientInfo.IP, push.srcClientInfo.Port, push.dstClientInfo.IP, push.dstClientInfo.Port, push.body.ShareID)
+		_, err = c.Instance.WriteToUDP(push.data, &net.UDPAddr{IP: net.ParseIP(push.srcClientInfo.IP), Port: push.srcClientInfo.Port})
+		if err != nil {
+			logger.Error(err)
+			// PASS
+		}
+
+		push.sendToDestinationClient()
+		logger.Infof("[income] from %s:%d to %s:%d with shareID: %s", push.srcClientInfo.IP, push.srcClientInfo.Port, push.dstClientInfo.IP, push.dstClientInfo.Port, push.body.ShareID)
+		_, err = c.Instance.WriteToUDP(push.data, &net.UDPAddr{IP: net.ParseIP(push.dstClientInfo.IP), Port: push.dstClientInfo.Port})
+		if err != nil {
+			logger.Error(err)
+			// PASS
+		}
+
+	}
 }
 
 func (push *pushContext) load(c *handler.Context) error {
@@ -65,9 +97,9 @@ func (push *pushContext) load(c *handler.Context) error {
 }
 
 func (push *pushContext) expire() {
-	push.resp.Action = "expire"
+	push.srcResp.Action = "expire"
 
-	data, err := json.Marshal(push.resp)
+	data, err := json.Marshal(push.srcResp)
 	if err != nil {
 		logger.Error(err)
 		return
@@ -75,6 +107,38 @@ func (push *pushContext) expire() {
 	push.data = data
 }
 
-func (push *pushContext) pushed() {
-	push.resp.Action = "expire"
+func (push *pushContext) sendToSourceClient() {
+	resp := pushResp{
+		Action: "pushed",
+		Data: pushData{
+			PeerAddr:    fmt.Sprintf("%s:%d", push.dstClientInfo.IP, push.dstClientInfo.Port),
+			PeerShareID: push.dstClientInfo.ShareID,
+		},
+	}
+	push.srcResp = resp
+
+	data, err := json.Marshal(push.srcResp)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	push.data = data
+}
+
+func (push *pushContext) sendToDestinationClient() {
+	resp := pushResp{
+		Action: "income",
+		Data: pushData{
+			PeerAddr:    fmt.Sprintf("%s:%d", push.srcClientInfo.IP, push.srcClientInfo.Port),
+			PeerShareID: push.srcClientInfo.ShareID,
+		},
+	}
+	push.dstResp = resp
+
+	data, err := json.Marshal(push.dstResp)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+	push.data = data
 }

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/Pawdia/sobani-tracker/logger"
 	"github.com/Pawdia/sobani-tracker/server"
 	"github.com/Pawdia/sobani-tracker/service"
 )
@@ -45,13 +44,21 @@ func Update(remote *net.UDPAddr, shareID string, lastseen int64) error {
 		if err != nil {
 			return err
 		}
-		i.ShareID = info.ShareID
-	} else if remote == nil && shareID != "" {
+		if info == nil {
+			i.ShareID = shareID
+		} else {
+			i.ShareID = info.ShareID
+		}
+	} else {
 		info, err := GetByShareID(shareID)
 		if err != nil {
 			return err
 		}
-		i.ShareID = info.ShareID
+		if info == nil {
+			i.ShareID = shareID
+		} else {
+			i.ShareID = info.ShareID
+		}
 	}
 
 	data, err := json.Marshal(i)
@@ -83,7 +90,6 @@ func Get(key []byte) (*Info, error) {
 		return nil, err
 	}
 
-	logger.Info(data)
 	var info Info
 	err = json.Unmarshal(data, &info)
 	if err != nil {

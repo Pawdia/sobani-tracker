@@ -5,6 +5,8 @@ import "github.com/Pawdia/sobani-tracker/handler"
 func announceHandlers() handler.Handler {
 	handlers := handler.Handler{
 		"announce": ActionAnnounce,
+		"push":     ActionPush,
+		"alive":    ActionAlive,
 	}
 	return handlers
 }
