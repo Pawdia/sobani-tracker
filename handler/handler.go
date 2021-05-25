@@ -1,53 +1,55 @@
 package handler
 
-import "github.com/Pawdia/sobani-tracker/server"
+import "net"
 
-// CodeSuccess 正常返回值
-const CodeSuccess = 0
+// 变量
+var (
+	DispatchHandlers Groups
+)
 
-// Action 行为类型
-type Action struct {
-	Type    string
-	Func    ActionFunc
-	Handler Func
+// Handler 处理器
+type Handler map[string]BaseHandler
+
+// BaseHandler 基本处理器
+type BaseHandler func(c *Context)
+
+// Handlers 处理对象
+type Handlers struct {
+	Handlers Handler
 }
 
-// Handler 处理控制器
-type Handler struct {
-	Name string
+// Groups 处理组
+type Groups []Handlers
 
-	SubHandlers []Handler
+// Context 上下文
+type Context struct {
+	Handler  BaseHandler  `json:"-"`
+	Instance *net.UDPConn `json:"-"`
+
+	Message   string `json:"message"`
+	Timestamp int64  `json:"timestamp"`
+
+	Body    interface{}  `json:"-"`
+	Remote  *net.UDPAddr `json:"-"`
+	ShareID string       `json:"-"`
 }
 
-// Func 处理器函数
-type Func func(*server.Context)
-
-// ActionFunc 行为对应的处理控制器调用的函数
-type ActionFunc func(c *server.Context) (ActionResponse, error)
-
-// ActionResponse 行为的响应结构体
-type ActionResponse interface{}
-
-type baseResponse struct {
-	Code int            `json:"code"`
-	Data ActionResponse `json:"data"`
+// Request 请求
+type Request struct {
+	Action string `json:"action"`
 }
 
-// ErrResponse 错误响应结构体
-type ErrResponse struct {
-	Code    int    `json:"code"`
-	Message string `json:"message"`
+// RemoteAddr 远程
+type RemoteAddr struct {
+	Address string `json:"-"`
+	Port    int    `json:"-"`
 }
 
-// NewAction 创建新的行为
-func NewAction(actionType string, handler ActionFunc) {
-	// a := &Action{Type: actionType, Func: handler}
-	// a.Handler = func(c *server.Context) {
-	// 	ctx := *c
-	// 	r, err := a.Func(&ctx)
-	// 	if err != nil {
-	// 		server.Handle(c)
-	// 	}
-	// 	c.JSON(baseResponse{Code: CodeSuccess, Data: r})
-	// }
+// Handler 命令处理
+func (h *Handlers) Handler() Handler {
+	return h.Handlers
+}
+
+// Dispatch 分发
+func Dispatch(c interface{}) {
 }

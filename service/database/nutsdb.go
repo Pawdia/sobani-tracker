@@ -59,6 +59,14 @@ func (ndb *NutsDB) Get(bucket string, key []byte) ([]byte, error) {
 	err = db.View(func(tx *nutsdb.Tx) error {
 		e, err := tx.Get(bucket, key)
 		if err != nil {
+			if err.Error() == nutsdb.ErrBucketAndKey(bucket, key).Error() {
+				b = make([]byte, 0)
+				return nil
+			}
+			if err.Error() == nutsdb.ErrKeyNotFound.Error() {
+				b = make([]byte, 0)
+				return nil
+			}
 			return err
 		}
 		b = e.Value
@@ -82,4 +90,9 @@ func (ndb *NutsDB) Del(bucket string, key []byte) error {
 		return nil
 	})
 	return err
+}
+
+// IsKeyNotFoundErr 是否是未找到错误
+func IsKeyNotFoundErr(err error) bool {
+	return err.Error() == "key not found in the bucket"
 }
