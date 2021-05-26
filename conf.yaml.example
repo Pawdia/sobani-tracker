@@ -1,7 +1,7 @@
 # 服务器配置
 app-name: "sobani-tracker"
 ip: "0.0.0.0"
-port: 0
+port: 8123
 
 # 数据库配置
 nutsdb: # nutsdb 配置

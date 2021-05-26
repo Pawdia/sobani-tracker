@@ -1,0 +1,14 @@
+version: "1"
+
+services:
+  sobani-tracker:
+    image: sobani-tracker
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sobani-tracker
+    volumes:
+      - ./:/usr/src/sobani-tracker/conf
+    ports:
+      - '8123:8123/udp'
